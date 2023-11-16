@@ -25,6 +25,10 @@ class RegisterDoctrineQueryBuilderPass implements CompilerPassInterface
             $definition->setClass(DoctrineQueryBuilder::class);
             $definition->setArguments([new Reference($serviceId)]);
 
+            if ($container->hasDefinition('query_builder.converter.plugin_registry')) {
+                $definition->addMethodCall('setConverterPluginRegistry', [new Reference('query_builder.converter.plugin_registry')]);
+            }
+
             $queryBuilderServiceId = \sprintf('query_builder.doctrine.%s', $serviceId);
             $queryBuilders[$name] = $queryBuilderServiceId;
 
