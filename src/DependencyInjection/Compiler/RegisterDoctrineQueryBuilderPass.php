@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\QueryBuilderBundle\DependencyInjection\Compiler;
 
+use MakinaCorpus\QueryBuilder\QueryBuilder;
 use MakinaCorpus\QueryBuilder\Bridge\Doctrine\DoctrineQueryBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -40,7 +41,7 @@ class RegisterDoctrineQueryBuilderPass implements CompilerPassInterface
                 $defaultConnectionId = $container->getParameter('doctrine.default_connection');
 
                 if ($queryBuilderId = ($queryBuilders[$defaultConnectionId] ?? null)) {
-                    $container->setAlias(DoctrineQueryBuilder::class, $queryBuilderId);
+                    $container->setAlias(QueryBuilder::class, $queryBuilderId);
                 }
             }
 
