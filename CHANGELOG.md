@@ -1,6 +1,6 @@
 # Changelog
 
-## Next
+## 1.0.0
 
 * [feature] ⭐️ Container will autowire any `MakinaCorpus\QueryBuilder\QueryBuilder`
   or `MakinaCorpus\QueryBuilder\DatabaseSession` argument using the parameter
