@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\QueryBuilderBundle\DependencyInjection\Compiler;
 
+use MakinaCorpus\QueryBuilder\DatabaseSession;
 use MakinaCorpus\QueryBuilder\QueryBuilder;
 use MakinaCorpus\QueryBuilder\Bridge\Doctrine\DoctrineQueryBuilder;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -30,18 +31,27 @@ class RegisterDoctrineQueryBuilderPass implements CompilerPassInterface
                 $definition->addMethodCall('setConverterPluginRegistry', [new Reference('query_builder.converter.plugin_registry')]);
             }
 
-            $queryBuilderServiceId = \sprintf('query_builder.doctrine.%s', $serviceId);
+            $queryBuilderServiceId = 'query_builder.session.' . $serviceId;
             $queryBuilders[$name] = $queryBuilderServiceId;
 
             $container->setDefinition($queryBuilderServiceId, $definition);
+
+            // Alias 'query_builder.doctrine.CONNECTION' is deprecated.
+            $container->setAlias('query_builder.doctrine.' . $serviceId, $queryBuilderServiceId);
+
+            // Register aliases based upon arguement name.
+            $container->registerAliasForArgument($queryBuilderServiceId, QueryBuilder::class, $name);
+            $container->registerAliasForArgument($queryBuilderServiceId, DatabaseSession::class, $name);
         }
 
         if ($queryBuilders) {
+            // Register global aliases that will target the default connection.
             if ($container->hasParameter('doctrine.default_connection')) {
                 $defaultConnectionId = $container->getParameter('doctrine.default_connection');
 
                 if ($queryBuilderId = ($queryBuilders[$defaultConnectionId] ?? null)) {
                     $container->setAlias(QueryBuilder::class, $queryBuilderId);
+                    $container->setAlias(DatabaseSession::class, $queryBuilderId);
                 }
             }
 
