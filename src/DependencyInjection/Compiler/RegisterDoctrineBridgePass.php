@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace MakinaCorpus\QueryBuilderBundle\DependencyInjection\Compiler;
 
+use MakinaCorpus\QueryBuilder\Bridge\Doctrine\DoctrineBridge;
 use MakinaCorpus\QueryBuilder\DatabaseSession;
 use MakinaCorpus\QueryBuilder\QueryBuilder;
-use MakinaCorpus\QueryBuilder\Bridge\Doctrine\DoctrineQueryBuilder;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
-use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 
-class RegisterDoctrineQueryBuilderPass implements CompilerPassInterface
+class RegisterDoctrineBridgePass implements CompilerPassInterface
 {
     public function process(ContainerBuilder $container): void
     {
@@ -24,7 +24,7 @@ class RegisterDoctrineQueryBuilderPass implements CompilerPassInterface
 
         foreach ($container->getParameter('doctrine.connections') as $name => $serviceId) {
             $definition = new Definition();
-            $definition->setClass(DoctrineQueryBuilder::class);
+            $definition->setClass(DoctrineBridge::class);
             $definition->setArguments([new Reference($serviceId)]);
 
             if ($container->hasDefinition('query_builder.converter.plugin_registry')) {

@@ -5,7 +5,7 @@ declare (strict_types=1);
 namespace MakinaCorpus\QueryBuilderBundle;
 
 use MakinaCorpus\QueryBuilderBundle\DependencyInjection\Compiler\RegisterConverterPluginPass;
-use MakinaCorpus\QueryBuilderBundle\DependencyInjection\Compiler\RegisterDoctrineQueryBuilderPass;
+use MakinaCorpus\QueryBuilderBundle\DependencyInjection\Compiler\RegisterDoctrineBridgePass;
 use MakinaCorpus\QueryBuilder\Converter\InputConverter;
 use MakinaCorpus\QueryBuilder\Converter\InputTypeGuesser;
 use MakinaCorpus\QueryBuilder\Converter\OutputConverter;
@@ -20,7 +20,7 @@ class QueryBuilderBundle extends Bundle
     public function build(ContainerBuilder $container): void
     {
         $container->addCompilerPass(new RegisterConverterPluginPass());
-        $container->addCompilerPass(new RegisterDoctrineQueryBuilderPass());
+        $container->addCompilerPass(new RegisterDoctrineBridgePass());
 
         $container->registerForAutoconfiguration(InputConverter::class)->addTag('query_builder.converter_plugin');
         $container->registerForAutoconfiguration(InputTypeGuesser::class)->addTag('query_builder.converter_plugin');

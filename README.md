@@ -2,14 +2,6 @@
 
 Integrates `makinacorpus/query-builder` into Symfony.
 
-This bundle will create a service per each `doctrine/dbal` connection:
-
- - Each service name is `query_builder.doctrine.CONNECTION_NAME`,
- - If a `default` connection is present, then an alias is wired for it using the
-   `MakinaCorpus\QueryBuilder\Bridge\Doctrine\DoctrineQueryBuilder` class name.
-
-And that's pretty much it, for now.
-
 # Setup
 
 First install:
@@ -29,6 +21,43 @@ return [
 
 And you're done.
 
+# Services
+
+Each Doctrine connection will have both `MakinaCorpus\QueryBuilder\QueryBuilder`
+and `MakinaCorpus\QueryBuilder\DatabaseSession` associated service in container.
+
+They are identifier by the `query_builder.session.CONNECTION_NAME` service
+identifier. You can manually inject by using the service name, or use autowiring.
+
+You can target a Doctrine connection by injecting a `QueryBuilder` or
+`DatabaseSession` typed service by setting the parameter name to the Doctrine
+connection name, for example:
+
+```php
+<?php
+
+declare (strict_types=1);
+
+namespace App\Controller;
+
+use MakinaCorpus\QueryBuilder\DatabaseSession;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Annotation\Route;
+
+class TestingController extends AbstractController
+{
+    #[Route('/testing/query-builder', name: 'testing_query_builder')]
+    public function testQueryBuilder(
+        DatabaseSession $someConnectionName,
+    ): Response {
+    }
+}
+```
+
+Will have the database session bridged over the `some_connection_name`
+configued Doctrine connection.
+
 # Usage
 
 Simply inject the service wherever you need it, a controller action for example:
@@ -40,7 +69,7 @@ declare (strict_types=1);
 
 namespace App\Controller;
 
-use MakinaCorpus\QueryBuilder\Bridge\Doctrine\DoctrineQueryBuilder;
+use MakinaCorpus\QueryBuilder\DatabaseSession;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -49,9 +78,9 @@ class TestingController extends AbstractController
 {
     #[Route('/testing/query-builder', name: 'testing_query_builder')]
     public function testQueryBuilder(
-        DoctrineQueryBuilder $queryBuilder,
+        DatabaseSession $session,
     ): Response {
-        $result = $queryBuilder
+        $result = $session
             ->select('some_table')
             ->executeQuery()
         ;
